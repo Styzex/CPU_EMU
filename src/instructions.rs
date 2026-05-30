@@ -8,5 +8,5 @@ pub const MOV: u8 = 0x06;
 pub const ADD: u8 = 0x07;
 pub const SUB: u8 = 0x08;
 pub const HLT: u8 = 0xFF;
-pub const R1: u8 = 0x01;
-pub const R2: u8 = 0x02;
+pub const R1: u8 = 0xF0;
+pub const R2: u8 = 0xF1;

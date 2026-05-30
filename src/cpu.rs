@@ -62,7 +62,7 @@ impl CPU {
         return self.i;
     }
 
-    pub fn run(&mut self) -> CPUStatus {
+    pub fn debug_run(&mut self) -> CPUStatus {
         if (self.pc as usize) + 1 >= self.mem.len() {
             return self.halt();
         }
@@ -334,7 +334,9 @@ impl CPU {
         return CPUStatus::Halt;
     }
 
-    pub fn fast_run(&mut self) {
+    // RELEASE MODE
+
+    pub fn release_run(&mut self) -> u8 {
         let opcode = self.mem[(self.pc) as usize].value;
         let operand1 = self.get_operand(1);
         let operand2 = self.get_operand(2);
@@ -343,44 +345,56 @@ impl CPU {
             JMP => {
                 self.fast_jmp(operand1);
                 self.i += 1;
+                return 0x00;
             }
             JZ => {
                 self.fast_jz(operand1, operand2);
                 self.i += 1;
+                return 0x00;
             }
             JNZ => {
                 self.fast_jnz(operand1, operand2);
                 self.i += 1;
+                return 0x00;
             }
             LOD => {
                 self.fast_load(operand1, operand2);
                 self.pc += 3;
                 self.i += 1;
+                return 0x00;
             }
             STR => {
                 self.fast_store(operand1, operand2);
                 self.pc += 3;
                 self.i += 1;
+                return 0x00;
             }
             MOV => {
                 self.fast_mov(operand1, operand2);
                 self.pc += 3;
                 self.i += 1;
+                return 0x00;
             }
             ADD => {
                 self.fast_add(operand1, operand2);
                 self.pc += 3;
                 self.i += 1;
+                return 0x00;
             }
             SUB => {
                 self.fast_subtract(operand1, operand2);
                 self.pc += 3;
                 self.i += 1;
+                return 0x00;
             }
-            HLT => self.fast_halt(),
+            HLT => {
+              self.fast_halt();
+              return 0x01;
+            }
             _ => {
                 self.pc += 1;
                 self.i += 1;
+                return 0x00;
             }
         }
     }

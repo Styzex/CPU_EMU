@@ -1,19 +1,31 @@
 # P1831 CPU Emulator
 
-- The P1831 is a 8 bit CPU that I have designed it's very basic
 - This emulator is just a fun project I've made for learning purposes
+- It runs at roughly 30% speed of your actual CPU
+- The P1831 is an 8-bit CPU that I designed. It is intentionally very simple.
 
-## Documentation of the Instruction Set Architecture for the P1831 Processor
+## Versions
+
+1. **release** - Maximum performance, zero safety checks.
+2. **debug** - Performs runtime validation and reports invalid operations.
+
+## Instruction Set Architecture (ISA)
 
 ### Constraints
 
-- **1GHz Clock speed**: It runs roughly at a 3:1 ratio
+- **Clock speed**: Variable
+- **Emulator performance**: Varies by hardware. Approximately 1 billion simulated instructions per second in release mode on the developer's machine.
 - **8-bit values only**: All values are unsigned integers (0-255)
-- **2 registers**: R1 and R2 are the only available registers
+- **2 registers**: R1 and R2 are general purpose registers and are the only available registers
 - **Memory layout**:
-  - Addresses 0-15: Safe data storage
-  - Addresses 16-63: Code section (writing here overwrites your program!)
+  - Addresses 0-15 contain your data. This section works as the memory for your code to use.
+  - Addresses 16-63 contain program instructions. Writing to this region modifies the running program.
+
+  > Programs may write to any address (0-63) at runtime.
+  > Writing to addresses 16-63 modifies the program itself, allowing self-modifying code.
+
 - **64 bytes total memory**: Addresses 0-63
+- **Program start address**: Execution begins at address 16 (0x10)
 
 ### Instructions
 
@@ -55,27 +67,70 @@
   - Syntax: `ADD register_dest register_src`
   - Operation: `register_dest = register_dest + register_src`
   - Example: `ADD R1 R2` (R1 = R1 + R2)
+  - Note: Overflow (result>255) causes an error
 
 - **SUB** - Subtract registers
   - Syntax: `SUB register_dest register_src`
   - Operation: `register_dest = register_dest - register_src`
   - Example: `SUB R1 R2` (R1 = R1 - R2)
-  - Note: Underflow (negative results) causes an error
+  - Note: Underflow (result<0) causes an error
 
-### Registers
+#### System Instructions
 
-#### General purpose registers
-
-- **R1**
-- **R2**
+- **HLT** - Halt execution
+  - Syntax: `HLT`
+  - Stops the processor
 
 ### Syntax Rules
 
-1. Every instruction, register, and value must be followed by a space
+1. Tokens must be separated by a single space.
 2. Instructions and registers must be in **UPPERCASE**
 3. Values are hexadecimal `0x05`
-4. Each operand and operator occupies 1 byte in memory
 
 ```
 operator operand operand
+```
+
+### Instruction Encoding
+
+Each instruction component (opcode, register, address, or immediate value) occupies 1 byte.
+
+Example:
+
+```
+ADD R1 R2
+
+Memory layout:
+[ADD][R1][R2]
+
+Total size: 3 bytes
+```
+
+#### Opcodes and Encodings
+
+| Instruction | Encoding |
+| ----------- | -------- |
+| JMP         | 0x01     |
+| JZ          | 0x02     |
+| JNZ         | 0x03     |
+| LOD         | 0x04     |
+| STR         | 0x05     |
+| MOV         | 0x06     |
+| ADD         | 0x07     |
+| SUB         | 0x08     |
+| HLT         | 0xFF     |
+
+| Register | Encoding |
+| -------- | -------- |
+| R1       | 0xF0     |
+| R2       | 0xF1     |
+
+## Code examples
+
+```ASM
+MOV R1 0xFF
+MOV R2 0x01
+SUB R1 R2
+JNZ R1 0x16
+HLT
 ```

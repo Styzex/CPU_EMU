@@ -9,6 +9,16 @@
 1. **release** - Maximum performance, zero safety checks.
 2. **debug** - Performs runtime validation and reports invalid operations.
 
+## Code examples
+
+```ASM
+MOV R1 0xFF
+MOV R2 0x01
+SUB R1 R2
+JNZ R1 0x16
+HLT
+```
+
 ## Instruction Set Architecture (ISA)
 
 ### Constraints
@@ -124,13 +134,3 @@ Total size: 3 bytes
 | -------- | -------- |
 | R1       | 0xF0     |
 | R2       | 0xF1     |
-
-## Code examples
-
-```ASM
-MOV R1 0xFF
-MOV R2 0x01
-SUB R1 R2
-JNZ R1 0x16
-HLT
-```
